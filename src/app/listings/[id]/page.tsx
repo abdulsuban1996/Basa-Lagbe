@@ -7,7 +7,11 @@ import {
 } from 'lucide-react'
 import { PhotoGallery } from '@/components/PhotoGallery'
 import { getListingById } from '@/lib/actions/listings'
-import { isBookmarked, getListingDirectCallStatus } from '@/lib/actions/renter'
+import {
+  isBookmarked,
+  getListingDirectCallStatus,
+  type ListingDirectCallInfo,
+} from '@/lib/actions/renter'
 import { getSiteSettings } from '@/lib/actions/settings'
 import { createClient } from '@/lib/supabase/server'
 import {
@@ -48,10 +52,18 @@ export default async function ListingDetailPage({
     data: { user },
   } = await supabase.auth.getUser()
   const isLoggedIn = !!user
-  const [bookmarked, directCallInfo] = await Promise.all([
-    isLoggedIn ? isBookmarked(id) : Promise.resolve(false),
-    isLoggedIn ? getListingDirectCallStatus(id) : Promise.resolve({}),
-  ])
+
+  let bookmarked = false
+  let directCallInfo: ListingDirectCallInfo = {}
+
+  if (isLoggedIn) {
+    const [bm, dc] = await Promise.all([
+      isBookmarked(id),
+      getListingDirectCallStatus(id),
+    ])
+    bookmarked = bm
+    directCallInfo = dc
+  }
 
   const isResidential = listing.category === 'residential'
 

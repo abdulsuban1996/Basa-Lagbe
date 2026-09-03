@@ -322,11 +322,15 @@ export async function getMyDirectCalls(): Promise<DirectCallWithListing[]> {
 // ---------------------------------------------------------------------------
 // getListingDirectCallStatus
 // ---------------------------------------------------------------------------
-export async function getListingDirectCallStatus(listingId: string): Promise<{
+export type ListingDirectCallInfo = {
   status?: 'pending' | 'verified' | 'rejected'
   landlordPhone?: string
   landlordName?: string
-}> {
+}
+
+export async function getListingDirectCallStatus(
+  listingId: string
+): Promise<ListingDirectCallInfo> {
   const { renter } = await getAuthenticatedRenter()
   if (!renter) return {}
 
