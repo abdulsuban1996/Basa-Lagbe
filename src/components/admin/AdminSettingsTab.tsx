@@ -39,13 +39,18 @@ export function AdminSettingsTab({ initialSettings }: Props) {
     try {
       const authRes = await fetch('/api/imagekit-auth')
       if (!authRes.ok) throw new Error('Auth failed')
-      const { token, expire, signature } = await authRes.json()
+      const { token, expire, signature, publicKey } = await authRes.json()
+
+      const pk =
+        publicKey ||
+        process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY ||
+        'public_SwUJt+vXf8Vmk3+Hzz05edUB57Y='
 
       const fd = new FormData()
       fd.append('file', file)
       fd.append('fileName', `${Date.now()}-${file.name.replace(/\s+/g, '_')}`)
       fd.append('folder', folder)
-      fd.append('publicKey', process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY!)
+      fd.append('publicKey', pk)
       fd.append('signature', signature)
       fd.append('expire', String(expire))
       fd.append('token', token)

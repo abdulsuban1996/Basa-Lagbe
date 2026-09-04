@@ -48,14 +48,19 @@ export default function NewListingPage() {
     setUploading(true)
     try {
       const authRes = await fetch('/api/imagekit-auth')
-      const { token, expire, signature } = await authRes.json()
+      const { token, expire, signature, publicKey } = await authRes.json()
+      const pk =
+        publicKey ||
+        process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY ||
+        'public_SwUJt+vXf8Vmk3+Hzz05edUB57Y='
+
       const urls: string[] = []
       for (const file of Array.from(files).slice(0, 5 - photoUrls.length)) {
         const fd = new FormData()
         fd.append('file', file)
         fd.append('fileName', `${Date.now()}-${file.name}`)
         fd.append('folder', '/basa-lagbe')
-        fd.append('publicKey', process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY!)
+        fd.append('publicKey', pk)
         fd.append('signature', signature)
         fd.append('expire', String(expire))
         fd.append('token', token)
